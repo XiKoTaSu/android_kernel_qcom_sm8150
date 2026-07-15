@@ -12,3 +12,13 @@ config MACH_OPLUS_SM7150
 	select MACH_OPLUS
 	help
 	  Support for OPlus SM7150 devices
+
+menu "OPlus board selection"
+
+config MACH_OPLUS_OP4AA7
+  bool "OPPO K5 board"
+  select MACH_OPLUS_SM7150
+  help
+    Support for OPPO K5 (OP4AA7)
+
+endmenu
