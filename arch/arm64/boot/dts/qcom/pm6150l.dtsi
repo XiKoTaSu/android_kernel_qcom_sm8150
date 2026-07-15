@@ -242,7 +242,9 @@
 				qcom,ires-ua = <12500>;
 				qcom,hdrm-voltage-mv = <325>;
 				qcom,hdrm-vol-hi-lo-win-mv = <100>;
+				#ifndef CONFIG_MACH_OPLUS_SM7150
 				status = "disabled";
+				#endif /* CONFIG_MACH_OPLUS_SM7150 */
 			};
 
 			pm6150l_torch0: qcom,torch_0 {
@@ -279,7 +281,9 @@
 				qcom,ires-ua = <12500>;
 				qcom,hdrm-voltage-mv = <325>;
 				qcom,hdrm-vol-hi-lo-win-mv = <100>;
+				#ifndef CONFIG_MACH_OPLUS_SM7150
 				status = "disabled";
+				#endif /* CONFIG_MACH_OPLUS_SM7150 */
 			};
 
 			pm6150l_switch0: qcom,led_switch_0 {
@@ -302,6 +306,15 @@
 				qcom,led-mask = <3>;
 				qcom,default-led-trigger = "switch2_trigger";
 			};
+
+			#ifndef CONFIG_MACH_OPLUS_SM7150
+			pm6150l_switch3: qcom,led_switch_3 {
+				label = "switch";
+				qcom,led-name = "led:switch_3";
+				qcom,led-mask = <4>;
+				qcom,default-led-trigger = "switch3_trigger";
+			};
+			#endif /* CONFIG_MACH_OPLUS_SM7150 */
 		};
 
 		pm6150l_wled: qcom,wled@d800 {

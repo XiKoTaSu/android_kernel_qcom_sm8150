@@ -374,7 +374,11 @@
 		qcom,platform-reset-gpio = <&pm6150l_gpios 9 0>;
 		qcom,panel-te-source = <0>;
 
+		#ifndef CONFIG_MACH_OPLUS_SM7150
 		vddio-supply = <&pm6150_l13>;
+		#else
+		vddio-supply = <&pm6150_l12>;
+		#endif /* CONFIG_MACH_OPLUS_SM7150 */
 		vdda-3p3-supply = <&pm6150_l18>;
 		lab-supply = <&lcdb_ldo_vreg>;
 		ibb-supply = <&lcdb_ncp_vreg>;
@@ -432,6 +436,9 @@
 		qcom,dsi-display-list =
 			<&dsi_nt35695b_truly_fhd_video_sec_display
 			&dsi_nt35695b_truly_fhd_cmd_sec_display>;
+		#ifdef CONFIG_MACH_OPLUS_SM7150
+		status = "disable";
+		#endif /* CONFIG_MACH_OPLUS_SM7150 */
 	};
 
 	sde_wb: qcom,wb-display@0 {
@@ -443,10 +450,17 @@
 
 &sde_dp {
 	qcom,dp-usbpd-detection = <&pm6150_pdphy>;
+	#ifdef CONFIG_MACH_OPLUS_SM7150
+	status = "disabled";
+	#endif /* CONFIG_MACH_OPLUS_SM7150 */
 };
 
 &mdss_mdp {
+	#ifndef CONFIG_MACH_OPLUS_SM7150
 	connectors = <&sde_rscc &sde_wb &sde_dsi &sde_dp &sde_dsi1>;
+	#else
+	connectors = <&sde_rscc &sde_wb &sde_dsi>;
+	#endif /* CONFIG_MACH_OPLUS_SM7150 */
 };
 
 &dsi_sw43404_amoled_video {

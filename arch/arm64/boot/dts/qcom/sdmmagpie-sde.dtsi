@@ -576,6 +576,9 @@
 	sde_dp: qcom,dp_display@0{
 		cell-index = <0>;
 		compatible = "qcom,dp-display";
+		#ifdef CONFIG_MACH_OPLUS_SM7150
+		status = "disabled";
+		#endif /* CONFIG_MACH_OPLUS_SM7150 */
 
 		vdda-1p2-supply = <&pm6150l_l3>;
 		vdda-0p9-supply = <&pm6150_l4>;

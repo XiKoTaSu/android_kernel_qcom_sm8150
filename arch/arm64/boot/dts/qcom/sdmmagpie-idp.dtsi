@@ -67,7 +67,9 @@
 
 &qupv3_se2_i2c {
 	status = "ok";
+	#ifndef CONFIG_MACH_OPLUS_SM7150
 	qcom,clk-freq-out = <1000000>;
+	#endif /* CONFIG_MACH_OPLUS_SM7150 */
 	nq@28 {
 		compatible = "qcom,nq-nci";
 		reg = <0x28>;
@@ -85,6 +87,16 @@
 		pinctrl-1 = <&nfc_int_suspend &nfc_enable_suspend
 				&nfc_clk_req_suspend>;
 	};
+
+	#ifdef CONFIG_MACH_OPLUS_SM7150
+	tfa98xx@35 {
+		compatible = "nxp,tfa98xx";
+		reg = <0x35>;
+		tfa9874_vdd-supply = <&pm6150_l10>;
+		tfa98xx_fw_name = "tfa98xx.cnt";
+		status = "okay";
+	};
+	#endif /* CONFIG_MACH_OPLUS_SM7150 */
 };
 
 &sdhc_1 {
@@ -115,10 +127,18 @@
 	qcom,vdd-io-current-level = <0 22000>;
 
 	pinctrl-names = "active", "sleep";
+	#ifndef CONFIG_MACH_OPLUS_SM7150
 	pinctrl-0 = <&sdc2_clk_on  &sdc2_cmd_on &sdc2_data_on &sdc2_cd_on>;
+	#else
+	pinctrl-0 = <&sdc2_clk_on  &sdc2_cmd_on &sdc2_data_on &sdc2_cd_on &sd_detect_default>;
+	#endif /* CONFIG_MACH_OPLUS_SM7150 */
 	pinctrl-1 = <&sdc2_clk_off &sdc2_cmd_off &sdc2_data_off &sdc2_cd_off>;
 
+	#ifndef CONFIG_MACH_OPLUS_SM7150
 	cd-gpios = <&tlmm 69 GPIO_ACTIVE_LOW>;
+	#else
+	cd-gpios = <&tlmm 69 GPIO_ACTIVE_HIGH>;
+	#endif /* CONFIG_MACH_OPLUS_SM7150 */
 
 	status = "ok";
 };
@@ -305,9 +325,12 @@
 };
 
 &qupv3_se7_i2c {
+	#ifndef CONFIG_MACH_OPLUS_SM7150
 	qcom,i2c-touch-active="st,fts";
+	#endif /* CONFIG_MACH_OPLUS_SM7150 */
 	status = "ok";
 
+	#ifndef CONFIG_MACH_OPLUS_SM7150
 	st_fts@49 {
 		compatible = "st,fts";
 		reg = <0x49>;
@@ -352,6 +375,7 @@
 		synaptics,reset-on-state = <0>;
 		synaptics,reset-active-ms = <20>;
 	};
+	#endif /* CONFIG_MACH_OPLUS_SM7150 */
 };
 
 &pm6150_qg {
@@ -369,15 +393,31 @@
 		      <&pm6150_vadc ADC_DIE_TEMP>,
 		      <&pm6150l_vadc ADC_AMUX_THM1_PU2>,
 		      <&pm6150_vadc ADC_SBUx>,
+		      #ifndef CONFIG_MACH_OPLUS_SM7150
 		      <&pm6150_vadc ADC_VPH_PWR>;
+		      #else
+		      <&pm6150l_vadc ADC_AMUX_THM1>,
+		      <&pm6150_vadc ADC_AMUX_THM3>,
+		      <&pm6150_vadc ADC_VPH_PWR>,
+		      <&pm6150_vadc ADC_GPIO4>;
+		      #endif /* CONFIG_MACH_OPLUS_SM7150 */
 	io-channel-names = "usb_in_voltage",
 			   "usb_in_current",
 			   "chg_temp",
 			   "die_temp",
 			   "conn_temp",
 			   "sbux_res",
+			   #ifndef CONFIG_MACH_OPLUS_SM7150
 			   "vph_voltage";
+			   #else
+			   "usb_temp1",
+			   "usb_temp2",
+			   "vph_voltage",
+			   "chgid_voltage";
+			   #endif /* CONFIG_MACH_OPLUS_SM7150 */
+
 	qcom,battery-data = <&mtp_batterydata>;
+	#ifndef CONFIG_MACH_OPLUS_SM7150
 	qcom,auto-recharge-soc = <98>;
 	qcom,step-charging-enable;
 	qcom,sw-jeita-enable;
@@ -386,6 +426,7 @@
 	qcom,sec-charger-config = <3>;
 	qcom,thermal-mitigation = <4200000 3500000 3000000
 			2500000 2000000 1500000 1000000 500000>;
+	#endif /* CONFIG_MACH_OPLUS_SM7150 */
 	dpdm-supply = <&qusb_phy0>;
 	qcom,charger-temp-max = <800>;
 	qcom,smb-temp-max = <800>;

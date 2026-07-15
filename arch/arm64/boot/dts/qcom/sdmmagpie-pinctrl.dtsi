@@ -200,7 +200,11 @@
 
 				config {
 					pins = "gpio34", "gpio35";
+					#ifndef CONFIG_MACH_OPLUS_SM7150
 					drive-strength = <2>;
+					#else
+					drive-strength = <6>;
+					#endif /* CONFIG_MACH_OPLUS_SM7150 */
 					bias-disable;
 				};
 			};
@@ -213,7 +217,11 @@
 
 				config {
 					pins = "gpio34", "gpio35";
+					#ifndef CONFIG_MACH_OPLUS_SM7150
 					drive-strength = <2>;
+					#else
+					drive-strength = <6>;
+					#endif /* CONFIG_MACH_OPLUS_SM7150 */
 					bias-pull-up;
 				};
 			};
@@ -253,13 +261,22 @@
 			nfc_enable_active: nfc_enable_active {
 				/* active state */
 				mux {
+					#ifndef CONFIG_MACH_OPLUS_SM7150
 					/* 12: Enable 36: Firmware */
 					pins = "gpio12", "gpio36";
+					#else
+					/* 67: Enable 36: Firmware */
+					pins = "gpio67", "gpio36";
+					#endif /* CONFIG_MACH_OPLUS_SM7150 */
 					function = "gpio";
 				};
 
 				config {
+					#ifndef CONFIG_MACH_OPLUS_SM7150
 					pins = "gpio12", "gpio36";
+					#else
+					pins = "gpio67", "gpio36";
+					#endif /* CONFIG_MACH_OPLUS_SM7150 */
 					drive-strength = <2>; /* 2 MA */
 					bias-pull-up;
 				};
@@ -268,13 +285,22 @@
 			nfc_enable_suspend: nfc_enable_suspend {
 				/* sleep state */
 				mux {
+					#ifndef CONFIG_MACH_OPLUS_SM7150
 					/* 12: Enable 36: Firmware */
 					pins = "gpio12", "gpio36";
+					#else
+					/* 67: Enable 36: Firmware */
+					pins = "gpio67", "gpio36";
+					#endif /* CONFIG_MACH_OPLUS_SM7150 */
 					function = "gpio";
 				};
 
 				config {
+					#ifndef CONFIG_MACH_OPLUS_SM7150
 					pins = "gpio12", "gpio36";
+					#else
+					pins = "gpio67", "gpio36";
+					#endif /* CONFIG_MACH_OPLUS_SM7150 */
 					drive-strength = <2>; /* 2 MA */
 					bias-disable;
 				};
@@ -721,7 +747,11 @@
 				config {
 					pins = "gpio44", "gpio45";
 					drive-strength = <2>;
+					#ifndef CONFIG_MACH_OPLUS_SM7150
 					bias-disable;
+					#else
+					bias-pull-down;
+					#endif /* CONFIG_MACH_OPLUS_SM7150 */
 				};
 			};
 
@@ -734,7 +764,12 @@
 				config {
 					pins = "gpio44", "gpio45";
 					drive-strength = <2>;
+					#ifndef CONFIG_MACH_OPLUS_SM7150
 					bias-disable;
+					#else
+					input-enable;
+					bias-pull-down;
+					#endif /* CONFIG_MACH_OPLUS_SM7150 */
 				};
 			};
 		};
@@ -1111,6 +1146,7 @@
 			};
 		};
 
+		#ifndef CONFIG_MACH_OPLUS_SM7150
 		wsa_swr_clk_pin {
 			wsa_swr_clk_sleep: wsa_swr_clk_sleep {
 				mux {
@@ -1166,8 +1202,10 @@
 				};
 			};
 		};
+		#endif /* CONFIG_MACH_OPLUS_SM7150 */
 
 		/* WSA speaker reset pins */
+		#ifndef CONFIG_MACH_OPLUS_SM7150
 		spkr_1_sd_n {
 			spkr_1_sd_n_sleep: spkr_1_sd_n_sleep {
 				mux {
@@ -1227,6 +1265,7 @@
 				};
 			};
 		};
+		#endif /* CONFIG_MACH_OPLUS_SM7150 */
 
 		wcd9xxx_intr {
 			wcd_intr_default: wcd_intr_default{
@@ -1653,6 +1692,122 @@
 				};
 			};
 		};
+
+		#ifdef CONFIG_MACH_OPLUS_SM7150
+		/* speaker */
+		ter_mi2s {
+			ter_mi2s_sleep: ter_mi2s_sleep {
+				mux {
+					pins = "gpio53", "gpio54";
+					function = "ter_mi2s";
+				};
+
+				config {
+					pins = "gpio53", "gpio54";
+					drive-strength = <2>;
+					bias-pull-down;
+					output-low;
+				};
+			};
+
+			ter_mi2s_active: ter_mi2s_active {
+				mux {
+					pins = "gpio53", "gpio54";
+					function = "ter_mi2s";
+				};
+
+				config {
+					pins = "gpio53", "gpio54";
+					drive-strength = <8>;
+					output-high;
+				};
+			};
+		};
+
+		ter_mi2s_sd0 {
+			ter_mi2s_sd0_sleep: ter_mi2s_sd0_sleep {
+				mux {
+					pins = "gpio55";
+					function = "ter_mi2s";
+				};
+
+				config {
+					pins = "gpio55";
+					drive-strength = <2>;
+					bias-pull-down;
+					input-enable;
+				};
+			};
+
+			ter_mi2s_sd0_active: ter_mi2s_sd0_active {
+				mux {
+					pins = "gpio55";
+					function = "ter_mi2s";
+				};
+
+				config {
+					pins = "gpio55";
+					drive-strength = <8>;
+					input-enable;
+				};
+			};
+		};
+
+		ter_mi2s_sd1 {
+			ter_mi2s_sd1_sleep: ter_mi2s_sd1_sleep {
+				mux {
+					pins = "gpio56";
+					function = "ter_mi2s";
+				};
+
+				config {
+					pins = "gpio56";
+					drive-strength = <2>;
+					bias-pull-down;
+					output-low;
+				};
+			};
+
+			ter_mi2s_sd1_active: ter_mi2s_sd1_active {
+				mux {
+					pins = "gpio56";
+					function = "ter_mi2s";
+				};
+
+				config {
+					pins = "gpio56";
+					drive-strength = <8>;
+					output-high;
+				};
+			};
+		};
+
+		dspg_wakeup_on: dspg_wakeup_on {
+			mux {
+				pins = "gpio5";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio5";
+				drive-strength = <2>;
+				bias-pull-up;
+			};
+		};
+
+		dspg_wakeup_off: dspg_wakeup_off {
+			mux {
+				pins = "gpio5";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio5";
+				drive-strength = <2>;
+				bias-disable;
+			};
+		};
+		#endif /* CONFIG_MACH_OPLUS_SM7150 */
 	};
 };
 
@@ -1680,4 +1835,16 @@
 			output-low;
 		};
 	};
+
+	#ifdef CONFIG_MACH_OPLUS_SM7150
+	sd_card_detect {
+		sd_detect_default: sd_detect_default {
+			pins = "gpio8"; /* GPIO 8 */
+			function = "normal"; /* normal input */
+			bias-disable; /* no pull */ 
+			power-source = <1>; /* VIN1 for 1.8V */
+			input-enable; /* digital input */
+		};
+	};
+	#endif /* CONFIG_MACH_OPLUS_SM7150 */
 };

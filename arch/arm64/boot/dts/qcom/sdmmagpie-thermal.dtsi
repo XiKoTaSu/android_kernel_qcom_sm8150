@@ -20,6 +20,9 @@
 		compatible = "qcom,msm-hw-limits";
 		interrupts = <GIC_SPI 32 IRQ_TYPE_LEVEL_HIGH>;
 		qcom,affinity = <0>;
+		#ifdef CONFIG_MACH_OPLUS_SM7150
+		dump_thres = <1017600>;
+		#endif /* CONFIG_MACH_OPLUS_SM7150 */
 		reg = <0x18358800 0x1000>,
 			<0x18323000 0x1000>;
 		#thermal-sensor-cells = <0>;
@@ -29,6 +32,9 @@
 		compatible = "qcom,msm-hw-limits";
 		interrupts = <GIC_SPI 33 IRQ_TYPE_LEVEL_HIGH>;
 		qcom,affinity = <1>;
+		#ifdef CONFIG_MACH_OPLUS_SM7150
+		dump_thres = <1094400>;
+		#endif /* CONFIG_MACH_OPLUS_SM7150 */
 		reg = <0x18350800 0x1000>,
 			<0x18325800 0x1000>;
 		#thermal-sensor-cells = <0>;
@@ -95,6 +101,22 @@
 		#cooling-cells = <2>;
 	};
 };
+
+#ifdef CONFIG_MACH_OPLUS_SM7150
+/{
+	shell_front {
+		compatible = "oplus,shell-temp";
+	};
+
+	shell_frame {
+		compatible = "oplus,shell-temp";
+	};
+
+	shell_back {
+		compatible = "oplus,shell-temp";
+	};
+};
+#endif /* CONFIG_MACH_OPLUS_SM7150 */
 
 &thermal_zones {
 	aoss-0-usr {
@@ -643,10 +665,18 @@
 	};
 
 	quiet-therm-adc {
+		#ifndef CONFIG_MACH_OPLUS_SM7150
 		polling-delay-passive = <0>;
 		polling-delay = <0>;
 		thermal-governor = "user_space";
 		thermal-sensors = <&pm6150_adc_tm ADC_AMUX_THM4_PU2>;
+		#else
+		polling-delay-passive = <50>;
+		polling-delay = <500>;
+		thermal-governor = "step_wise";
+		thermal-sensors = <&pm6150_adc_tm ADC_AMUX_THM4_PU2>;
+		temp-track;
+		#endif /* CONFIG_MACH_OPLUS_SM7150 */
 		wake-capable-sensor;
 		trips {
 			active-config0 {
@@ -654,6 +684,40 @@
 				hysteresis = <1000>;
 				type = "passive";
 			};
+		#ifdef CONFIG_MACH_OPLUS_SM7150
+			skin_trip0: skin-trip0 {
+				temperature = <81000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+			skin_trip1: skin-trip1 {
+				temperature = <83000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+			skin_trip2: skin-trip2 {
+				temperature = <85000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+		};
+		cooling-maps {
+			cpu1_cdev0 {
+				trip = <&skin_trip0>;
+				cooling-device =
+					<&CPU6 THERMAL_NO_LIMIT 2>;
+			};
+			cpu1_cdev1 {
+				trip = <&skin_trip1>;
+				cooling-device =
+					<&CPU6 THERMAL_NO_LIMIT 6>;
+			};
+			cpu1_cdev2 {
+				trip = <&skin_trip2>;
+				cooling-device =
+					<&CPU6 THERMAL_NO_LIMIT 8>;
+			};
+		#endif /* CONFIG_MACH_OPLUS_SM7150 */
 		};
 	};
 
@@ -1781,7 +1845,11 @@
 				type = "passive";
 			};
 			gold_trip: gold-trip {
+				#ifndef CONFIG_MACH_OPLUS_SM7150
 				temperature = <50000>;
+				#else
+				temperature = <80000>;
+				#endif /* CONFIG_MACH_OPLUS_SM7150 */
 				hysteresis = <0>;
 				type = "passive";
 			};
@@ -1791,7 +1859,11 @@
 				type = "passive";
 			};
 			skin_gpu_trip: skin-gpu-trip {
+				#ifndef CONFIG_MACH_OPLUS_SM7150
 				temperature = <52000>;
+				#else
+				temperature = <82000>;
+				#endif /* CONFIG_MACH_OPLUS_SM7150 */
 				hysteresis = <4000>;
 				type = "passive";
 			};
@@ -1801,7 +1873,11 @@
 				type = "passive";
 			};
 			silver_trip: silver-trip {
+				#ifndef CONFIG_MACH_OPLUS_SM7150
 				temperature = <54000>;
+				#else
+				temperature = <84000>;
+				#endif /* CONFIG_MACH_OPLUS_SM7150 */
 				hysteresis = <0>;
 				type = "passive";
 			};

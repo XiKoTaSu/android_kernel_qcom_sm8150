@@ -57,6 +57,30 @@
 		status = "disabled";
 	};
 
+	#ifdef CONFIG_MACH_OPLUS_SM7150
+	qupv3_se0_spi: spi@0x880000 {
+		compatible = "qcom,spi-geni";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <0x880000 0x4000>;
+		reg-names = "se_phys";
+		clock-names = "se-clk", "m-ahb", "s-ahb";
+		clocks = <&clock_gcc GCC_QUPV3_WRAP0_S0_CLK>,
+			<&clock_gcc GCC_QUPV3_WRAP_0_M_AHB_CLK>,
+			<&clock_gcc GCC_QUPV3_WRAP_0_S_AHB_CLK>;
+		pinctrl-names = "default", "sleep";
+		pinctrl-0 = <&qupv3_se0_spi_active>;
+		pinctrl-1 = <&qupv3_se0_spi_sleep>;
+		interrupts = <GIC_SPI 601 0>;
+		spi-max-frequency = <50000000>;
+		qcom,wrapper-core = <&qupv3_0>;
+		dmas = <&gpi_dma0 0 0 1 64 0>,
+			<&gpi_dma0 1 0 1 64 0>;
+		dma-names = "tx", "rx";
+		status = "ok";
+	};
+	#endif /* CONFIG_MACH_OPLUS_SM7150 */
+
 	/* I2C */
 	qupv3_se1_i2c: i2c@884000 {
 		compatible = "qcom,i2c-geni";
@@ -399,6 +423,7 @@
 		status = "disabled";
 	};
 
+	#ifndef CONFIG_MACH_OPLUS_SM7150
 	qupv3_se10_i2c: i2c@62688000 {
 		compatible = "qcom,i2c-geni";
 		reg = <0x62688000 0x4000>;
@@ -415,6 +440,7 @@
 		qcom,wrapper-core = <&qupv3_2>;
 		status = "disabled";
 	};
+	#endif /* CONFIG_MACH_OPLUS_SM7150 */
 
 	qupv3_se11_i2c: i2c@6268c000 {
 		compatible = "qcom,i2c-geni";
@@ -488,6 +514,7 @@
 		status = "disabled";
 	};
 
+	#ifndef CONFIG_MACH_OPLUS_SM7150
 	qupv3_se10_spi: spi@62688000 {
 		compatible = "qcom,spi-geni";
 		reg = <0x62688000 0x4000>;
@@ -507,4 +534,5 @@
 		qcom,disable-dma;
 		status = "disabled";
 	};
+	#endif /* CONFIG_MACH_OPLUS_SM7150 */
 };
