@@ -233,9 +233,15 @@
 
 		msm_cam_smmu_ife {
 			compatible = "qcom,msm-cam-smmu-cb";
+			#ifndef CONFIG_MACH_OPLUS_OP4AA7
 			iommus = <&apps_smmu 0x820 0x40>,
 				<&apps_smmu 0x840 0x0>,
 				<&apps_smmu 0x860 0x40>;
+			#else
+			iommus = <&apps_smmu 0x820 0x0>,
+				<&apps_smmu 0x840 0x0>,
+				<&apps_smmu 0x860 0x0>;
+			#endif /* CONFIG_MACH_OPLUS_OP4AA7 */
 			label = "ife";
 			ife_iova_mem_map: iova-mem-map {
 				/* IO region is approximately 3.4 GB */

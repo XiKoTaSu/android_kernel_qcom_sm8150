@@ -30,6 +30,9 @@
 #include "dsi-panel-sharp-qsync-wqhd-video.dtsi"
 #include "dsi-panel-sharp-qsync-fhd-video.dtsi"
 #include "dsi-panel-sharp-qsync-fhd-cmd.dtsi"
+#ifdef CONFIG_MACH_OPLUS_OP4AA7
+#include "dsi-panel_oppo18097samsung_ams641rw01_1080_2340.dtsi"
+#endif /* CONFIG_MACH_OPLUS_OP4AA7 */
 #include <dt-bindings/clock/mdss-10nm-pll-clk.h>
 
 &soc {
@@ -292,6 +295,7 @@
 		qcom,dsi-panel = <&dsi_nt35695b_truly_fhd_cmd>;
 	};
 
+	#ifndef CONFIG_MACH_OPLUS_OP4AA7
 	dsi_rm69299_visionox_amoled_vid_display: qcom,dsi-display@17 {
 		label = "dsi_rm69299_visionox_amoled_vid_display";
 		qcom,display-type = "primary";
@@ -302,6 +306,18 @@
 
 		qcom,dsi-panel = <&dsi_rm69299_visionox_amoled_video>;
 	};
+	#else
+	dsi_oppo18097samsung_ams641rw01_1080_2340_cmd_display: qcom,dsi-display@17 {
+		label = "dsi_oppo18097samsung_ams641rw01_1080_2340_cmd_display";
+		qcom,display-type = "primary";
+
+		qcom,dsi-ctrl-num = <0>;
+		qcom,dsi-phy-num = <0>;
+		qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
+
+		qcom,dsi-panel = <&dsi_oppo18097samsung_ams641rw01_1080_2340_cmd>;
+	};
+	#endif /* CONFIG_MACH_OPLUS_OP4AA7 */
 
 	dsi_sharp_qsync_wqhd_cmd_display: qcom,dsi-display@18 {
 		label = "dsi_sharp_qsync_wqhd_cmd_display";
@@ -399,7 +415,11 @@
 			&dsi_rm69298_truly_amoled_cmd_display
 			&dsi_nt35695b_truly_fhd_video_display
 			&dsi_nt35695b_truly_fhd_cmd_display
+			#ifndef CONFIG_MACH_OPLUS_OP4AA7
 			&dsi_rm69299_visionox_amoled_vid_display
+			#else
+			&dsi_oppo18097samsung_ams641rw01_1080_2340_cmd_display
+			#endif /* CONFIG_MACH_OPLUS_OP4AA7 */
 			&dsi_sharp_qsync_wqhd_cmd_display
 			&dsi_sharp_qsync_wqhd_video_display
 			&dsi_sharp_qsync_fhd_video_display
@@ -485,6 +505,24 @@
 		};
 	};
 };
+
+#ifdef CONFIG_MACH_OPLUS_OP4AA7
+&dsi_oppo18097samsung_ams641rw01_1080_2340_cmd {
+	qcom,ulps-enabled;
+	qcom,mdss-dsi-t-clk-post = <0x0E>;
+	qcom,mdss-dsi-t-clk-pre = <0x35>;
+	qcom,mdss-dsi-display-timings {
+		timing@0{
+			qcom,mdss-dsi-panel-phy-timings = [00 22 05 09 25 23 09 09 06 03 04 00];
+			//[00 13 05 04 1F 1E 05	05 03 02 04 00];
+
+			qcom,mdss-mdp-transfer-time-us = <13000>;
+			qcom,display-topology = <1 0 1>;
+			qcom,default-topology-index = <0>;
+		};
+	};
+};
+#endif /* CONFIG_MACH_OPLUS_OP4AA7 */
 
 &dsi_sw43404_amoled_cmd {
 	qcom,ulps-enabled;

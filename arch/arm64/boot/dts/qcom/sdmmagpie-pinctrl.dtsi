@@ -1383,6 +1383,7 @@
 			};
 		};
 
+		#ifndef CONFIG_MACH_OPLUS_OP4AA7
 		cam_sensor_mclk0_active: cam_sensor_mclk0_active {
 			/* MCLK0 */
 			mux {
@@ -1494,6 +1495,7 @@
 				drive-strength = <2>; /* 2 MA */
 			};
 		};
+		#endif /* CONFIG_MACH_OPLUS_OP4AA7 */
 
 		/* SDC pin type */
 		sdc1_clk_on: sdc1_clk_on {
@@ -1633,6 +1635,7 @@
 			};
 		};
 
+		#ifndef CONFIG_MACH_OPLUS_OP4AA7
 		pmx_ts_active {
 			ts_active: ts_active {
 				mux {
@@ -1692,6 +1695,7 @@
 				};
 			};
 		};
+		#endif /* CONFIG_MACH_OPLUS_OP4AA7 */
 
 		#ifdef CONFIG_MACH_OPLUS_SM7150
 		/* speaker */

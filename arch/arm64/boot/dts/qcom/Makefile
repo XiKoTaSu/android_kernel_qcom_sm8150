@@ -1,4 +1,18 @@
 # SPDX-License-Identifier: GPL-2.0
+ifeq ($(CONFIG_MACH_OPLUS),y)
+ifeq ($(CONFIG_MACH_OPLUS_SM7150),y)
+ifeq ($(CONFIG_BUILD_ARM64_DT_OVERLAY),y)
+	dtbo-$(CONFIG_MACH_OPLUS_OP4AA7) += \
+		sdmmagpie-idp-overlay-OP4AA7.dtbo
+
+sdmmagpie-idp-overlay-OP4AA7.dtbo-base := sdmmagpie-OP4AA7.dtb
+else # CONFIG_BUILD_ARM64_DT_OVERLAY
+dtb-$(CONFIG_MACH_OPLUS_OP4AA7)	+= \
+	sdmmagpie-idp-OP4AA7.dtb
+endif # CONFIG_BUILD_ARM64_DT_OVERLAY
+endif # CONFIG_MACH_OPLUS_SM7150
+
+else # CONFIG_MACH_OPLUS
 ifeq ($(TARGET_BOARD_TYPE),auto)
 ifeq ($(CONFIG_BUILD_ARM64_DT_OVERLAY),y)
 	dtbo-$(CONFIG_ARCH_SM8150) += \
@@ -587,6 +601,8 @@ dtb-$(CONFIG_ARCH_SDM429W) += sdm429-wtp.dtb\
 endif
 
 endif
+
+endif # CONFIG_MACH_OPLUS
 
 ifeq ($(CONFIG_ARM64),y)
 always		:= $(dtb-y)
