@@ -56,6 +56,9 @@ jobs:
           export CLANG_TRIPLE="aarch64-linux-gnu-"
           export PATH="$GITHUB_WORKSPACE/workdir/clang/bin:$GITHUB_WORKSPACE/workdir/gcc/bin/:$PATH"
           export TARGET_PRODUCT=sm6150
+          export LD=ld.lld
+          export LLVM=1
+          export LLVM_IAS=1
 
           cd $GITHUB_WORKSPACE/workdir/source
           make -j$(nproc --all) O=out CC=clang vendor/sdmsteppe-perf_defconfig vendor/debugfs.config
