@@ -25,6 +25,12 @@
 #include <linux/regulator/machine.h>
 #include <linux/regulator/of_regulator.h>
 #include <linux/string.h>
+#ifdef CONFIG_MACH_OPLUS
+#include <linux/gpio.h>
+#include <linux/of_gpio.h>
+#include <linux/mutex.h>
+#include <soc/oplus/system/oppo_project.h>
+#endif
 
 #define pm8008_err(reg, message, ...) \
 	pr_err("%s: " message, (reg)->rdesc.name, ##__VA_ARGS__)
@@ -52,6 +58,10 @@
 #define MODE_STATE_BYPASS		0
 
 #define LDO_VSET_LB_REG(base)		(base + 0x40)
+
+#ifdef CONFIG_MACH_OPLUS
+#define LDO_VSET_VALID_LB_REG(base)	(base + 0x42)
+#endif
 
 #define LDO_MODE_CTL1_REG(base)		(base + 0x45)
 #define MODE_PRIMARY_MASK		GENMASK(2, 0)
@@ -107,6 +117,53 @@ static struct regulator_data reg_data[] = {
 			{"pm8008_l6", "vdd_l6", 10000, 300000},
 			{"pm8008_l7", "vdd_l7", 10000, 300000},
 };
+
+#ifdef CONFIG_MACH_OPLUS
+struct pm8008_reset_info  {
+	struct platform_device *pdev;
+	int reset_gpio;
+};
+
+static struct pm8008_reset_info g_pm8008_reset_info[2];
+struct regmap *g_reset_regmap = NULL;
+struct regulator_dev *g_fingherprint_rdev = NULL;
+struct mutex reset_lock;
+static int pm8008_do_probe(struct platform_device *pdev);
+void pm8008_do_reset(void);
+void max98927_LR_reset(void);
+static void (*func_max98927_LR_reset)(void);
+
+void reset_pm8008_max98927(void)
+{
+	static int rst_num = 0;
+
+	pr_err("%s: enter\n", __func__);
+
+	if(0 == rst_num) {
+		mutex_init(&reset_lock);
+	}
+
+	if(!func_max98927_LR_reset) {
+		func_max98927_LR_reset = symbol_request(max98927_LR_reset);
+	}
+
+	mutex_lock(&reset_lock);
+	//reset two times
+	pm8008_do_reset();
+	if(func_max98927_LR_reset) {
+		func_max98927_LR_reset();
+	}
+	pm8008_do_reset();
+	if(func_max98927_LR_reset) {
+		func_max98927_LR_reset();
+	}
+	rst_num++;
+	mutex_unlock(&reset_lock);
+
+	pr_err("%s: exit, reset %d times\n", __func__, rst_num);
+}
+EXPORT_SYMBOL(reset_pm8008_max98927);
+#endif
 
 /* common functions */
 static int pm8008_read(struct regmap *regmap,  u16 reg, u8 *val, int count)
@@ -634,6 +691,53 @@ static int pm8008_register_ldo(struct pm8008_regulator *pm8008_reg,
 	return 0;
 }
 
+#ifdef CONFIG_MACH_OPLUS
+void pm8008_do_reset()
+{
+	unsigned int val = 0;
+	int rc = 0;
+
+	gpio_set_value(g_pm8008_reset_info[1].reset_gpio, 0);
+	gpio_set_value(g_pm8008_reset_info[0].reset_gpio, 0);
+
+	pr_err("pm8008 reset gpio val %d %d ",
+				gpio_get_value(g_pm8008_reset_info[1].reset_gpio),\
+				gpio_get_value(g_pm8008_reset_info[0].reset_gpio));
+
+	msleep(10);
+	gpio_set_value(g_pm8008_reset_info[1].reset_gpio, 1);
+	msleep(10);
+	/* get defualt i2c address to modify second pm8008 address*/
+	//reset_regmap = dev_get_regmap(g_pm8008_reset_info[0].pdev->dev.parent, NULL);
+	pr_err("pm8008 modify second pm8008 address ");
+
+	rc = regmap_read(g_reset_regmap,0x0644,&val);
+	if (rc < 0) {
+		pr_err("pm8008 modify second pm8008 address fail");
+	}
+	pr_err("pm8008-reset pm8008-chip-2  read 0x0644 0x%x",val);
+	rc = regmap_write(g_reset_regmap,0x0644,0x01);
+	if (rc < 0) {
+		pr_err("pm8008 modify second pm8008 address fail rc = %d",rc);
+	}
+	msleep(1);
+	rc = regmap_read(g_reset_regmap,0x0644,&val);
+	if (rc < 0) {
+		pr_err("pm8008 read second pm8008 address fail rc = %d",rc);
+	}
+	pr_err("pm8008-reset pm8008-chip-2  read 0x0644 0x%x",val);
+	msleep(10);
+	gpio_set_value(g_pm8008_reset_info[0].reset_gpio, 1);
+	pm8008_do_probe(g_pm8008_reset_info[1].pdev);
+	pm8008_do_probe(g_pm8008_reset_info[0].pdev);
+
+	if( g_fingherprint_rdev != NULL) {
+		pm8008_regulator_enable(g_fingherprint_rdev);
+	}
+
+}
+#endif
+
 /* PMIC probe and helper function */
 static int pm8008_parse_regulator(struct regmap *regmap, struct device *dev)
 {
@@ -666,6 +770,36 @@ static int pm8008_parse_regulator(struct regmap *regmap, struct device *dev)
 
 	return 0;
 }
+
+#ifdef CONFIG_MACH_OPLUS
+static int pm8008_do_probe(struct platform_device *pdev){
+	int rc = 0;
+	struct regmap *regmap;
+	const char * regulator_name;
+	struct device_node *regulator_node =  pdev->dev.of_node;
+
+	pr_debug("pm8008_regulator_probe X\n");
+
+	rc = of_property_read_string(regulator_node, "pm8008-name",&regulator_name);
+
+	regmap = dev_get_regmap(pdev->dev.parent, NULL);
+	if (!regmap) {
+		pr_err("parent regmap is missing\n");
+		return -EINVAL;
+	}
+
+	pr_err("pm8008 regulaot name is %s\n",regulator_name);
+
+	rc = pm8008_parse_regulator(regmap, &pdev->dev);
+	if (rc < 0) {
+		pr_err("failed to parse device tree rc=%d\n", rc);
+		return rc;
+	}
+
+	return 0;
+
+}
+#endif
 
 static int pm8008_regulator_probe(struct platform_device *pdev)
 {
