@@ -1277,7 +1277,11 @@ EXPORT_SYMBOL(scm_is_secure_device);
  */
 #define TZ_RTIC_ENABLE_MEM_PROTECTION	0x4
 #if IS_ENABLED(CONFIG_QCOM_QHEE_ENABLE_MEM_PROTECTION)
+#ifdef CONFIG_MACH_OPLUS
+static int __init scm_mem_protection_init(void)
+#else
 int scm_enable_mem_protection(void)
+#endif
 {
 	struct scm_desc desc = {0};
 	int ret = 0, resp;
@@ -1308,9 +1312,18 @@ int scm_enable_mem_protection(void)
 	return resp;
 }
 #else
+
+#ifdef CONFIG_MACH_OPLUS
 inline int scm_enable_mem_protection(void)
 {
 	return 0;
 }
 #endif
+
+#endif
+
+#ifndef CONFIG_MACH_OPLUS
 EXPORT_SYMBOL(scm_enable_mem_protection);
+#else
+early_initcall(scm_mem_protection_init);
+#endif
